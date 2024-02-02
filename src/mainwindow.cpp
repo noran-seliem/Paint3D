@@ -63,6 +63,8 @@
 #include <vtkSmartPointer.h>
 #include <vtkAssembly.h>
 
+#include <vtkPropPicker.h>
+
 /**
  * @brief Construct a new Main Window:: Main Window object
  * 
@@ -81,6 +83,9 @@ MainWindow::MainWindow(QWidget* parent)
 	mRenderWindow->AddRenderer(mRenderer);
 
 	ui->openGLWidget->setRenderWindow(mRenderWindow);
+	ui->openGLWidget->installEventFilter(this);
+
+	
 	mRenderer->ResetCamera();
 	mRenderWindow->Render();
 
@@ -92,6 +97,8 @@ MainWindow::MainWindow(QWidget* parent)
 	vtkNew<vtkNamedColors> colors;
 	mRenderer->SetBackground(colors->GetColor3d("Cornsilk").GetData());
 
+
+	////////////////////////////////////////////////////////////////////////////
 
 	ui->doubleSpinBox->setValue(1.00);
 	ui->plainTextEdit->hide();
@@ -146,7 +153,29 @@ MainWindow::~MainWindow()
 	delete ui;
 }
 
+bool MainWindow::eventFilter(QObject* obj, QEvent* event)
+{
+	// Capturing keyboard events for moving
+	if (event->type() == QEvent::MouseButtonDblClick)
+	{
+		vtkSmartPointer<vtkPropPicker> picker = vtkSmartPointer<vtkPropPicker>::New();
 
+		int x, y;
+		mRenderWindow->GetInteractor()->GetEventPosition(x, y);
+		picker->Pick(x, y, 0, mRenderer);
+		MainWindow::pickedActor = picker->GetActor();
+
+		if (MainWindow::pickedActor)
+		{
+			MainWindow::pickedActor->GetProperty()->EdgeVisibilityOn();
+			MainWindow::pickedActor->GetProperty()->SetEdgeColor(1, 1, 0);
+			mRenderer->ResetCamera();
+			mRenderWindow->Render();
+		}
+		
+	}
+	return QObject::eventFilter(obj, event);
+}
 /**
  * @brief set Actor Color And Opacity 
  * 
@@ -828,35 +857,35 @@ void MainWindow::onOkClicked() {
 	}
 	switch (ui->comboBox_2->currentIndex()) {
 	case 0:
-		setActorColorAndOpacity(editableShape->GetActor(), ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value(), ui->doubleSpinBox->value());
+		setActorColorAndOpacity(MainWindow::pickedActor, ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value(), ui->doubleSpinBox->value());
 		break;
 	case 1:
-		deleteActor(editableShape->GetActor());
+		deleteActor(MainWindow::pickedActor);
 		ui->comboBox->removeItem(objectNumber-1);
 		ui->comboBox_3->removeItem(objectNumber - 1);
 		break;
 
 		break;
 	case 2:
-		rotateActor(editableShape->GetActor(), ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value());
+		rotateActor(MainWindow::pickedActor, ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value());
 
 		break;
 	case 3:
-		scaleActor(editableShape->GetActor(), -1, 1, 1);
+		scaleActor(MainWindow::pickedActor, -1, 1, 1);
 
 		break;
 		
 	case 4:
-		scaleActor(editableShape->GetActor(), 1, -1, 1);
+		scaleActor(MainWindow::pickedActor, 1, -1, 1);
 		break;
 	case 5:
-		scaleActor(editableShape->GetActor(), 1, 1, -1);
+		scaleActor(MainWindow::pickedActor, 1, 1, -1);
 		break;
 	case 6:
-		translateActor(editableShape->GetActor(), ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value());
+		translateActor(MainWindow::pickedActor, ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value());
 		break;
 	case 7:
-		scaleActor(editableShape->GetActor(), ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value());
+		scaleActor(MainWindow::pickedActor, ui->spinBox->value(), ui->spinBox_2->value(), ui->spinBox_3->value());
 		break;
 	}
 

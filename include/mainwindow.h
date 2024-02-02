@@ -62,7 +62,7 @@ private:
     int shapeType = 0;
     std::string inputFile;
     vtkSmartPointer<vtkPolyData> STLpolydata;
-
+    vtkActor* pickedActor;
 public slots:
     void onDrawConeClick();
     void onDrawSphereClick();
@@ -86,7 +86,7 @@ public slots:
     void translateActor(vtkActor* actor, double x, double y, double z);
     void mergeActors(vtkActor* actor1, vtkActor* actor2);
     void deleteActor(vtkActor* actor);
-
+    bool eventFilter(QObject* obj, QEvent* event);
    
 };
 
