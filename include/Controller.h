@@ -2,10 +2,82 @@
 #include "Model.h"
 #include "View.h"
 #include<stdio.h>
+#include <vtkSmartPointer.h>
+#include <vtkAssembly.h>
 
+#include <vtkPropPicker.h>
+#include <vtkInteractorStyleTrackballCamera.h>
+
+#include <vtkCellPicker.h>
+#include <vtkInteractorStyleTrackballActor.h>
+#include <vtkCommand.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderer.h>
+
+class MyCommand : public vtkCommand
+{
+private:
+    vtkActor* actor;
+    vtkActor* prevActor = NULL;
+public:
+    static MyCommand* New()
+    {
+        return new MyCommand;
+    }
+
+    // Add a member variable to store the interactor pointer
+
+    virtual void Execute(vtkObject* caller, unsigned long eventId,
+        void* callData)
+    {
+        vtkRenderWindowInteractor* interactor = static_cast<vtkRenderWindowInteractor*>(caller);
+        int* clickPos = interactor->GetEventPosition();
+        vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
+        vtkRenderer* renderer = interactor->FindPokedRenderer(clickPos[0], clickPos[1]);
+
+        picker->Pick(clickPos[0], clickPos[1], 0, renderer);
+        // Get the picked actor
+
+
+        actor = picker->GetActor();
+
+        if (actor) {
+            std::string message = actor->GetObjectName();
+            // QMessageBox::information(nullptr, "Title", QString("actor name is : %1").arg(QString::fromStdString(message)));
+
+            actor->GetProperty()->EdgeVisibilityOn();
+            actor->GetProperty()->SetEdgeColor(1, 1, 0);
+            interactor->Render();
+
+            if (prevActor) {
+                prevActor->GetProperty()->EdgeVisibilityOff();
+
+                if (actor == prevActor) {
+                    prevActor = NULL;
+                    actor = NULL;
+                }
+                else {
+                    actor->GetProperty()->EdgeVisibilityOn();
+                    actor->GetProperty()->SetEdgeColor(1, 1, 0);
+                    interactor->Render();
+                    prevActor = actor;
+                }
+            }
+            else {
+                prevActor = actor;
+            }
+
+        }
+    }
+    vtkActor* getActor() {
+        return actor;
+    }
+};
 class Controller {
 public:
      vtkSmartPointer<vtkActor> GetActor();
+     virtual ~Controller();
 
 protected:
 

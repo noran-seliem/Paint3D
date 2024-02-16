@@ -3,30 +3,122 @@
 
 #include <QMainWindow>
 
-#include <vtkActor.h>
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkRenderer.h>
-#include <vtkSphereSource.h>
 
-#include <vtkGenericOpenGLRenderWindow.h>
-#include <vtkRenderer.h>
-#include <QVTKInteractor.h>
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <vtkSmartPointer.h>
 
 #include "Model.h"
 #include "View.h"
 #include "Controller.h"
 #include "Stl.h"
+#include "Volume.h"
+#include "MainController.h"
+
+
 
 namespace Ui {
     class MainWindow;
 }
+
+// Define interaction style.
+class customMouseInteractorStyle : public vtkInteractorStyleTrackballCamera
+{
+private:
+  
+    vtkActor* actor;
+public:
+    static customMouseInteractorStyle* New();
+    vtkTypeMacro(customMouseInteractorStyle, vtkInteractorStyleTrackballCamera);
+    virtual void OnLeftButtonDoubleClick() override
+    {
+        // Get the current mouse position
+        int* clickPos = this->GetInteractor()->GetEventPosition();
+
+        // Pick an actor from the scene using a cell picker
+        vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
+        // Get the mouse position
+
+
+        // Find the poked renderer
+        vtkRenderer* renderer = this->GetInteractor()->FindPokedRenderer(clickPos[0], clickPos[1]);
+        // auto defaultRen = this->GetDefaultRenderer();
+        // picker->Pick(clickPos[0], clickPos[1], 0, defaultRen);
+        picker->Pick(clickPos[0], clickPos[1], 0, renderer);
+        // Get the picked actor
+        actor = picker->GetActor();
+        // actor = picker->GetActor();
+       //  mainWin->pickedActor = picker->GetActor();
+         // If an actor is picked, change its color to yellow
+        if (actor)
+        {
+            actor->GetProperty()->EdgeVisibilityOn();
+            actor->GetProperty()->SetEdgeColor(1, 1, 0);
+            //actor->GetProperty()->SetColor(1.0, 1.0, 0.0); // yellow
+            this->GetInteractor()->Render();
+        }
+
+        // Forward events
+        vtkInteractorStyleTrackballCamera::OnLeftButtonDoubleClick();
+    }
+    vtkActor* getActor() {
+        return actor;
+    }
+
+};
+
+//class MyCommand : public vtkCommand
+//{
+//private:
+//    vtkActor* actor;
+//    vtkActor* prevActor= NULL;
+//public:
+//    static MyCommand* New()
+//    {
+//        return new MyCommand;
+//    }
+//
+//    // Add a member variable to store the interactor pointer
+//
+//    virtual void Execute(vtkObject* caller, unsigned long eventId,
+//        void* callData)
+//    {
+//        vtkRenderWindowInteractor* interactor = static_cast<vtkRenderWindowInteractor*>(caller);
+//        int* clickPos = interactor->GetEventPosition();
+//        vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
+//        vtkRenderer* renderer = interactor->FindPokedRenderer(clickPos[0], clickPos[1]);
+//
+//        picker->Pick(clickPos[0], clickPos[1], 0, renderer);
+//        // Get the picked actor
+//        
+//
+//        actor = picker->GetActor();
+//        if (actor) {
+//            actor->GetProperty()->EdgeVisibilityOn();
+//            actor->GetProperty()->SetEdgeColor(1, 1, 0);
+//            interactor->Render();
+//
+//            if (prevActor) {
+//                prevActor->GetProperty()->EdgeVisibilityOff();
+//
+//                if (actor == prevActor) {
+//                    prevActor = NULL;
+//                    actor = NULL;
+//                }
+//                else {
+//                    actor->GetProperty()->EdgeVisibilityOn();
+//                    actor->GetProperty()->SetEdgeColor(1, 1, 0);
+//                    interactor->Render();
+//                    prevActor = actor;
+//                }
+//            }
+//            else {
+//                prevActor = actor;
+//            }
+//           
+//        }
+//    }
+//    vtkActor* getActor() {
+//        return actor;
+//    }
+//};
 
 class MainWindow : public QMainWindow
 {
@@ -36,33 +128,30 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
-private:
+public:
     Ui::MainWindow* ui;
-    vtkNew<vtkGenericOpenGLRenderWindow> mRenderWindow;
-    vtkNew<vtkRenderer> mRenderer;
-    struct Triplet {
-        Controller* first;
-        int second;
-        int third;
-    };
-    std::vector<Triplet> objectVectorpair;
-    std::vector<std::pair<SphereController*, int>> spherePair;
-    std::vector<std::pair<CubeController*, int>> cubePair;
-    std::vector<std::pair<ConeController*, int>> conePair;
-    std::vector<std::pair<CurvedCylinderController*, int>> curvedCylPair;
-    std::vector<std::pair<CylinderController*, int>> cylinderPair;
-    std::vector<std::pair<PyramidController*, int>> pyramidPair;
-    std::vector<std::pair<HemisphereController*, int>> hemispherePair;
-    std::vector<std::pair<TubeController*, int>> tubePair;
-    std::vector<std::pair<DonutController*, int>> donutPair;
+    //vtkNew<vtkGenericOpenGLRenderWindow> mRenderWindow;
+    //vtkNew<vtkRenderer> mRenderer;
+    vtkGenericOpenGLRenderWindow* mRenderWindow ;
+    vtkRenderer* mRenderer;
+    MainController* mainController = new MainController(mRenderWindow, mRenderer);
+    ///////////////////////
+    vtkGenericOpenGLRenderWindow* mRenderWindow2;
+    vtkRenderer* mRenderer2;
+    //vtkNew<vtkGenericOpenGLRenderWindow> mRenderWindow2;
+    //vtkNew<vtkRenderer> mRenderer2;
+    //////////////////////
+
     int objectCount = 0;
     int objectNumber = 0;
-    int extractInteger(std::string str);
-    std::vector<int> extractMultiIntegers(std::string str);
+
+    void updateUi();
     int shapeType = 0;
     std::string inputFile;
-    vtkSmartPointer<vtkPolyData> STLpolydata;
-    vtkActor* pickedActor;
+
+    vtkActor* pickedActor = vtkActor::New();
+    vtkNew<customMouseInteractorStyle> style;
+    MyCommand* myCommand;
 public slots:
     void onDrawConeClick();
     void onDrawSphereClick();
@@ -75,19 +164,18 @@ public slots:
     void onDrawDonutClick();
     void onLoadSTLClick();
     void onSaveSTLClick();
+    void onLoadVolClick();
+
     void onMergeClick();
     void onOkClicked();
     void onEditClick();
     void onNextClicked();
 
-    void setActorColorAndOpacity(vtkActor* actor, double r, double g, double b, double opacity);
-    void rotateActor(vtkActor* actor, double angle, double angle2, double angle3);
-    void scaleActor(vtkActor* actor, double x, double y, double z);
-    void translateActor(vtkActor* actor, double x, double y, double z);
-    void mergeActors(vtkActor* actor1, vtkActor* actor2);
-    void deleteActor(vtkActor* actor);
+
     bool eventFilter(QObject* obj, QEvent* event);
-   
+
+
 };
+
 
 #endif // MAINWINDOW_H

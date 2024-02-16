@@ -1,0 +1,12 @@
+How to get renderer from interactor
+Pick in interactor
+Mouse event
+Debugging in visual studio
+ Vtk command 
+Events in vtk
+
+
+
+debugging:
+store things in variables to check them 
+ auto defaultRen = this->GetDefaultRenderer();

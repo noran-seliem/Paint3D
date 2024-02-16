@@ -12,6 +12,10 @@ vtkSmartPointer<vtkActor> Controller::GetActor() {
     return actor;
 }
 
+Controller::~Controller()
+{
+}
+
 
 /**
  * @brief Construct a new Tube Controller:: Tube Controller object
