@@ -46,11 +46,11 @@
 #include <QPushButton.h>
 #include <QComboBox.h>
 
+//#include "Controller.h"
 
 class MyCommand;
 
 
-// The mouse motion callback, to turn "Slicing" on and off
 class vtkImageInteractionCallback : public vtkCommand
 {
 public:
@@ -62,7 +62,7 @@ public:
         this->ImageReslice = nullptr;
         this->Interactor = nullptr;
     }
-    void vtk_reslicing(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir, int view);
+  //  void vtk_reslicing(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir, int view);
     void SetImageReslice(vtkImageReslice* reslice) { this->ImageReslice = reslice; }
 
     vtkImageReslice* GetImageReslice() { return this->ImageReslice; }
@@ -139,28 +139,23 @@ private:
 
 class DICOMVolume
 {
-	//Q_OBJECT // Macro for Qt signals and slots
 
 public:
-	DICOMVolume();
+	DICOMVolume(QString dataDir);
 
 	~DICOMVolume();
 
 public:
 
-	void  vtk_surface_rendering_UI(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir);
-	void vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir);
-   // void vtk_reslicing(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir) {
-
+	//void  vtk_surface_rendering_UI(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir);
+	void vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer);
+    void vtk_reslicing(vtkRenderWindow* renWin, vtkRenderer* aRenderer, int view);
 
 	MyCommand* myCommand;
 
 	vtkSmartPointer<vtkDICOMImageReader> reader;
-	vtkSmartPointer<vtkContourFilter> surfaceExtractor;
-	vtkSmartPointer<vtkPolyDataNormals> surfaceNormals;
-	vtkSmartPointer<vtkPolyDataMapper> surfaceMapper;
-	vtkSmartPointer<vtkActor> surface;
-	vtkSmartPointer<vtkCamera> aCamera;
+    vtkSmartPointer<vtkAlgorithmOutput> readerOutput;
+  //  auto readerOutput = reader->GetOutputPort();
 	vtkSmartPointer<vtkInteractorStyleTrackballCamera> style;
 	vtkSmartPointer<vtkRenderWindowInteractor> iren;
 	vtkSmartPointer<vtkGPUVolumeRayCastMapper> volumeMapper;

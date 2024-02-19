@@ -155,10 +155,11 @@ void  MainWindow::onLoadVolClick() {
 	ui->openGLWidget_3->show();
 	ui->openGLWidget_4->show();
 	ui->openGLWidget_5->show();
+	mainController->volRayCasting(dataDir);
+
 	mainController->axialView(dataDir);
 	mainController->coronalView(dataDir);
 
-	mainController->volRayCasting(dataDir);
 	mainController->sagitalView(dataDir);
 }
 /**

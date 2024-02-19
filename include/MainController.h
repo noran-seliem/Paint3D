@@ -154,7 +154,7 @@ public:
     MyCommand* myCommand;
     vtkGenericOpenGLRenderWindow* GetRenWin();
     vtkRenderer* GetRen();
-
+    DICOMVolume* volume;
    // void onOkClicked();
     void changeProperty(std::string selecteditem, vtkActor* selectActorCom, int property, int spinbox, int spinbox2, int spinbox3, double spinbox4);
     void editShape(vtkActor* selectActorCom, std::string plainEdit, int spinbox, int spinbox2, int spinbox3, double spinbox4);

@@ -15,6 +15,9 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 
+#include <vtkGPUVolumeRayCastMapper.h>
+#include <QMessageBox.h>
+
 class MyCommand : public vtkCommand
 {
 private:
@@ -49,7 +52,11 @@ public:
             actor->GetProperty()->EdgeVisibilityOn();
             actor->GetProperty()->SetEdgeColor(1, 1, 0);
             interactor->Render();
+            if (vtkGPUVolumeRayCastMapper::SafeDownCast(actor->GetMapper()))
+            {
+                QMessageBox::information(nullptr, "Title", QString("volume"));
 
+            }
             if (prevActor) {
                 prevActor->GetProperty()->EdgeVisibilityOff();
 

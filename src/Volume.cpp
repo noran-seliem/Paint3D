@@ -5,24 +5,21 @@
 #include <vtkAutoInit.h>
 #include <vtkImageProperty.h>
 
-#include "MainController.h"
+#include "Controller.h"
 //forward declaration 
 VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
 //E:\git projects\DONE\MedicalVisualisation-GUI-using-VTK-main\MedicalVisualisation-GUI-using-VTK-main\data
-// Constructor that takes the UI object as an argument.
-DICOMVolume::DICOMVolume()
+// Constructor that takes the dicom directory as an argument.
+DICOMVolume::DICOMVolume(QString dataDir)
 {
  
 
-
     // Create and initialize the vtk objects.
     reader = vtkSmartPointer<vtkDICOMImageReader>::New();
-    surfaceExtractor = vtkSmartPointer<vtkContourFilter>::New();
-    surfaceNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-    surfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    surface = vtkSmartPointer<vtkActor>::New();
-    aCamera = vtkSmartPointer<vtkCamera>::New();
-   
+    reader->SetDirectoryName(dataDir.toStdString().c_str());
+    reader->Update();
+    //readerOutput = reader->GetOutputPort();
+
     style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
     iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     volumeMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
@@ -31,7 +28,6 @@ DICOMVolume::DICOMVolume()
     volumeProperty = vtkSmartPointer<vtkVolumeProperty>::New();
     volume = vtkSmartPointer<vtkVolume>::New();
 
-    // Set the render window and the interactor for the UI widget.
 
 }
 
@@ -40,11 +36,6 @@ DICOMVolume::~DICOMVolume()
 {
     // Delete the vtk objects.
     reader->Delete();
-    surfaceExtractor->Delete();
-    surfaceNormals->Delete();
-    surfaceMapper->Delete();
-    surface->Delete();
-    aCamera->Delete();
     style->Delete();
     iren->Delete();
     volumeMapper->Delete();
@@ -54,7 +45,7 @@ DICOMVolume::~DICOMVolume()
     volume->Delete();
 }
 
-
+/*
 void  DICOMVolume::vtk_surface_rendering_UI(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir)
 {
   
@@ -102,19 +93,15 @@ void  DICOMVolume::vtk_surface_rendering_UI(vtkRenderWindow* renWin, vtkRenderer
   //  iren->AddObserver(vtkCommand::LeftButtonPressEvent, myCommand);
     renWin->Render();
 }
+*/
 
-
-void DICOMVolume::vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir) {
-    reader->SetDirectoryName(dataDir.toStdString().c_str());
-    reader->Update();
-    //vtkRenderer* ren = vtkRenderer::New();
-    //vtkRenderWindow* renWin = vtkRenderWindow::New();
+void DICOMVolume::vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer) {
+   
     renWin->AddRenderer(aRenderer);
     vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
     iren->SetRenderWindow(renWin);
 
     vtkGPUVolumeRayCastMapper* volumeMapper = vtkGPUVolumeRayCastMapper::New();
-    // Assuming self.reader.GetOutputPort() is already defined
     volumeMapper->SetInputConnection(reader->GetOutputPort());
     volumeMapper->SetBlendModeToComposite();
 
@@ -165,6 +152,9 @@ void DICOMVolume::vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer
     aRenderer->SetActiveCamera(camera);
     iren->SetRenderWindow(renWin);
     iren->SetInteractorStyle(vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New());
+    myCommand = MyCommand::New();
+
+    iren->AddObserver(vtkCommand::LeftButtonPressEvent, myCommand);
 
     renWin->Render();
 }
@@ -174,23 +164,13 @@ void DICOMVolume::vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer
  * @param int 1:4
  * 
  */
-void vtkImageInteractionCallback::vtk_reslicing(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir, int view) {
 
-    // Start by loading some data.
-    //vtkSmartPointer<vtkImageReader2> reader = vtkSmartPointer<vtkImageReader2>::New();
-    vtkSmartPointer<vtkDICOMImageReader> reader = vtkSmartPointer<vtkDICOMImageReader>::New();
 
-    reader->SetDirectoryName(dataDir.toStdString().c_str());
-   // reader->SetFilePrefix("E:/git projects/DONE/MedicalVisualisation-GUI-using-VTK-main/MedicalVisualisation-GUI-using-VTK-main/data/Ankle/vhf");
-    reader->SetDataExtent(0, 63, 0, 63, 1, 93);
-    reader->SetDataSpacing(3.2, 3.2, 1.5);
-    reader->SetDataOrigin(0.0, 0.0, 0.0);
-    reader->SetDataScalarTypeToUnsignedShort();
-    reader->SetDataByteOrderToLittleEndian();
-    reader->UpdateWholeExtent();
+void DICOMVolume::vtk_reslicing(vtkRenderWindow* renWin, vtkRenderer* aRenderer,  int view) {
 
-    // Calculate the center of the volume
-    reader->Update();
+
+   // Calculate the center of the volume
+
     int extent[6];
     double spacing[3];
     double origin[3];
@@ -206,67 +186,69 @@ void vtkImageInteractionCallback::vtk_reslicing(vtkRenderWindow* renWin, vtkRend
 
    //  Matrices for axial, coronal, sagittal, oblique view orientations
     static double viewElements[16];
-    static double axialElements[16] = {
-   1, 0, 0, 0,
-   0, 1, 0, 0,
-   0, 0, 1, 0,
-   0, 0, 0, 1 };
-    static double coronalElements[16] = {
-          1, 0, 0, 0,
-          0, 0, 1, 0,
-          0,-1, 0, 0,
-          0, 0, 0, 1 };
-    static double sagittalElements[16] = {
-    0, 0, -1, 0,
-    1, 0, 0, 0,
-    0, -1, 0, 0,
-    0, 0, 0, 1
-    };
-    static double obliqueElements[16] = {
-    1, 0, 0, 0,
-    0, 0.866025, -0.5, 0,
-    0, 0.5, 0.866025, 0,
-    0, 0, 0, 1 };
-
+ 
     switch (view)
     {
-    case(1) :
-
+    case(1): {
+        static double axialElements[16] = {
+                                              1, 0, 0, 0,
+                                              0, 1, 0, 0,
+                                              0, 0, 1, 0,
+                                              0, 0, 0, 1 };
         for (int i = 0; i < 16; i++)
         {
             viewElements[i] = axialElements[i];
         }
-            break;
-    case(2):
-      
+        break;
+    }
+
+
+    case(2): {
+        static double coronalElements[16] = {
+        1, 0, 0, 0,
+        0, 0, 1, 0,
+        0,-1, 0, 0,
+        0, 0, 0, 1 };
         for (int i = 0; i < 16; i++)
         {
             viewElements[i] = coronalElements[i];
         }
         break;
-    case(3):
-       
+    }
+      
+
+    case(3): {
+        static double sagittalElements[16] = {
+           0, 0, -1, 0,
+           1, 0, 0, 0,
+           0, -1, 0, 0,
+           0, 0, 0, 1
+        };
         for (int i = 0; i < 16; i++)
         {
             viewElements[i] = sagittalElements[i];
         }
         break;
-    case(4):
-
+    }
+       
+     
+    case(4): {
+        static double obliqueElements[16] = {
+          1, 0, 0, 0,
+          0, 0.866025, -0.5, 0,
+          0, 0.5, 0.866025, 0,
+          0, 0, 0, 1 };
         for (int i = 0; i < 16; i++)
         {
             viewElements[i] = obliqueElements[i];
         }
+        break;
+    }
+
+
     default:
         break;
     }
-   
-    
-
-   
-
-    
-
     // Set the slice orientation
     vtkSmartPointer<vtkMatrix4x4> resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
     //choose element view
@@ -278,6 +260,8 @@ void vtkImageInteractionCallback::vtk_reslicing(vtkRenderWindow* renWin, vtkRend
 
     // Extract a slice in the desired orientation
     vtkSmartPointer<vtkImageReslice> reslice = vtkSmartPointer<vtkImageReslice>::New();
+    //vtkSmartPointer<vtkImageData> imageData = vtkSmartPointer<vtkImageData>::New();
+    //imageData = reader->GetOutput();
     reslice->SetInputConnection(reader->GetOutputPort());
     reslice->SetOutputDimensionality(2);
     reslice->SetResliceAxes(resliceAxes);
@@ -300,61 +284,28 @@ void vtkImageInteractionCallback::vtk_reslicing(vtkRenderWindow* renWin, vtkRend
     vtkSmartPointer<vtkImageActor> actor = vtkSmartPointer<vtkImageActor>::New();
     actor->GetMapper()->SetInputConnection(color->GetOutputPort());
 
-  //  vtkSmartPointer<vtkRenderer> aRenderer = vtkSmartPointer<vtkRenderer>::New();
     aRenderer->AddActor(actor);
-    //actor->GetProperty()->SetColorLevel(0.0);
-    //actor->GetProperty()->SetColorWindow(2000.0);
-   // vtkSmartPointer<vtkRenderWindow> renWin = vtkSmartPointer<vtkRenderWindow>::New();
+   
     renWin->AddRenderer(aRenderer);
     aRenderer->ResetCamera();
     aRenderer->ResetCameraClippingRange();
     aRenderer->SetBackground(0,0,0);
 
-    ///////////////////////////
-   // vtkSmartPointer<vtkCamera> aCamera = vtkSmartPointer<vtkCamera>::New();
-   // // Set the camera parameters
-   // aCamera->SetViewUp(0, 0, -1);
-   // aCamera->SetPosition(0, 1, 0);
-   // aCamera->SetFocalPoint(0, 0, 0);
-   // aCamera->ComputeViewPlaneNormal();
-
-   // // Add the actor and the camera to the renderer
-   // aRenderer->SetActiveCamera(aCamera);
-
-
-   //// double scale = aCamera->GetParallelScale();
-   //// double referenceHeight = actor->GetLength();
-   //// int* currentRenderWindowHeight = renWin->GetActualSize();
-   //// aCamera->SetParallelScale(scale * referenceHeight / currentRenderWindowHeight[1]);
-   ////// camera->SetPosition(0, 650, 0);
-   ////// camera->SetFocalPoint(0, 0, 0);
-   //// aCamera->SetViewUp(0, 1, 0);
-   // aRenderer->ResetCamera();
-
-    //////////////////////////////
+  
 
     // Set up the interaction
-    vtkSmartPointer<vtkInteractorStyleImage> imageStyle =
-        vtkSmartPointer<vtkInteractorStyleImage>::New();
-    vtkSmartPointer<vtkRenderWindowInteractor> interactor =
-        vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    vtkSmartPointer<vtkInteractorStyleImage> imageStyle = vtkSmartPointer<vtkInteractorStyleImage>::New();
+    vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     interactor->SetInteractorStyle(imageStyle);
     renWin->SetInteractor(interactor);
     renWin->Render();
 
-    vtkSmartPointer<vtkImageInteractionCallback> callback =
-        vtkSmartPointer<vtkImageInteractionCallback>::New();
+    vtkSmartPointer<vtkImageInteractionCallback> callback = vtkSmartPointer<vtkImageInteractionCallback>::New();
     callback->SetImageReslice(reslice);
     callback->SetInteractor(interactor);
 
     imageStyle->AddObserver(vtkCommand::MouseMoveEvent, callback);
     imageStyle->AddObserver(vtkCommand::LeftButtonPressEvent, callback);
     imageStyle->AddObserver(vtkCommand::LeftButtonReleaseEvent, callback);
-    // Start interaction
-    // The Start() method doesn't return until the window is closed by the user
-
-
-
-
-
+   
 }

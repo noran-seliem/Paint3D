@@ -38,9 +38,9 @@ MainController::MainController(vtkRenderWindow* renWin, vtkRenderer* aRenderer) 
 void  MainController::volRayCasting(QString dataDir) {
 
 
-	DICOMVolume* volume = new DICOMVolume();
+	MainController::volume = new DICOMVolume(dataDir);
 
-	volume->vtk_rayCasting(MainController::mRenderWindow, MainController::mRenderer, dataDir);
+	volume->vtk_rayCasting(MainController::mRenderWindow, MainController::mRenderer);
 	mRenderWindow->Render();
 
 
@@ -48,21 +48,21 @@ void  MainController::volRayCasting(QString dataDir) {
 
 void  MainController::axialView(QString dataDir) {
 
-	vtkImageInteractionCallback* reslicing = new vtkImageInteractionCallback();
-	reslicing->vtk_reslicing(MainController::mRenderWindow2, MainController::mRenderer2, dataDir, 1);
+
+	volume->vtk_reslicing(MainController::mRenderWindow2, MainController::mRenderer2, 1);
 
 
 }
 
 
 void  MainController::coronalView(QString dataDir) {
-	vtkImageInteractionCallback* reslicing = new vtkImageInteractionCallback();
-	reslicing->vtk_reslicing(MainController::mRenderWindow3, MainController::mRenderer3, dataDir, 2);
+
+	volume->vtk_reslicing(MainController::mRenderWindow3, MainController::mRenderer3, 2);
 
 }
 void  MainController::sagitalView(QString dataDir) {
-	vtkImageInteractionCallback* reslicing = new vtkImageInteractionCallback();
-	reslicing->vtk_reslicing(MainController::mRenderWindow4, MainController::mRenderer4, dataDir, 3);
+
+	volume->vtk_reslicing(MainController::mRenderWindow4, MainController::mRenderer4, 3);
 
 }
 
