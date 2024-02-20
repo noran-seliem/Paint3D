@@ -369,11 +369,21 @@ void MainController::changeProperty(std::string selecteditem, vtkActor* selectAc
 		case 0:
 			MainController::setActorColorAndOpacity(selectActorChoice, spinbox, spinbox2, spinbox3, spinbox4);
 			break;
-		case 1:
+		case 1: {
 			MainController::deleteActor(selectActorChoice);
-			//ui->comboBox->removeItem(objectNumber - 1);
-			//ui->comboBox_3->removeItem(objectNumber - 1);
+
+			std::string name = selectActorChoice->GetObjectName();
+			for (auto it = objectNames.begin(); it != objectNames.end(); ++it)
+			{
+				if (name == *it) {
+					objectNames.erase(it);
+					break;
+				}
+			}
+
 			break;
+		}
+			
 
 			
 		case 2:
@@ -754,6 +764,7 @@ void MainController::deleteActor(vtkActor* actor) {
 	mRenderer->RemoveActor(actor);
 	mRenderer->ResetCamera();
 	mRenderWindow->Render();
+
 }
 /**
  * @brief merge two actors
