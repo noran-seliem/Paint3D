@@ -33,20 +33,14 @@
 #include "vtkInteractorStyleImage.h"
 #include "vtkLookupTable.h"
 #include "vtkMatrix4x4.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-#include "vtkRenderer.h"
-#include "vtkSmartPointer.h"
+
 #include "vtkStreamingDemandDrivenPipeline.h"
 
 #include <QApplication.h>
-#include <QMainWindow.h>
-#include <QFileDialog.h>
-#include <QSlider.h>
-#include <QPushButton.h>
+
 #include <QComboBox.h>
 
-//#include "Controller.h"
+
 
 class MyCommand;
 
@@ -126,13 +120,10 @@ public:
     }
 
 private:
-    // Actions (slicing only, for now)
     int Slicing;
 
-    // Pointer to vtkImageReslice
     vtkImageReslice* ImageReslice;
 
-    // Pointer to the interactor
     vtkRenderWindowInteractor* Interactor;
 };
 
@@ -147,9 +138,8 @@ public:
 
 public:
 
-	//void  vtk_surface_rendering_UI(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir);
-	void vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer);
-    void vtk_reslicing(vtkRenderWindow* renWin, vtkRenderer* aRenderer, int view);
+	void rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer);
+    void reslicingDicom(vtkRenderWindow* renWin, vtkRenderer* aRenderer, int view);
 
 	MyCommand* myCommand;
 

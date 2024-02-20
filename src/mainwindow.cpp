@@ -167,47 +167,47 @@ void  MainWindow::onLoadVolClick() {
  * 
  */
 void MainWindow::onDrawSphereClick() {
-	mainController->DrawSphere();
+	mainController->drawSphere();
 	updateUi();
 }
 void MainWindow::onDrawConeClick() {
-	mainController->onDrawConeClick();
+	mainController->drawCone();
 	updateUi();
 
 
 }
 void MainWindow::onDrawHemisphereClick() {
-	mainController->onDrawHemisphereClick();
+	mainController->drawHemisphere();
 	updateUi();
 
 }
 void MainWindow::onDrawCubeClick() {
-	mainController->onDrawCubeClick();
+	mainController->drawCube();
 	updateUi();
 
 }
 void MainWindow::onDrawPyramidClick() {
-	mainController->onDrawPyramidClick();
+	mainController->drawPyramid();
 	updateUi();
 
 }
 void MainWindow::onDrawTubeClick() {
-	mainController->onDrawTubeClick();
+	mainController->drawTube();
 	updateUi();
 
 }
 void MainWindow::onDrawCylinderClick() {
-	mainController->onDrawCylinderClick();
+	mainController->drawCylinder();
 	updateUi();
 
 }
 void MainWindow::onDrawCurvedCylinderClick() {
-	mainController->onDrawCurvedCylinderClick();
+	mainController->drawCurvedCylinder();
 	updateUi();
 
 }
 void MainWindow::onDrawDonutClick() {
-	mainController->onDrawDonutClick();
+	mainController->drawDonut();
 	updateUi();
 
 }
@@ -230,7 +230,7 @@ void MainWindow::updateUi() {
 
 void  MainWindow::onLoadSTLClick(){
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QDir::homePath(), tr("STL (*.STL )"));
-	mainController->onLoadSTLClick(fileName);
+	mainController->loadSTL(fileName);
 	
 	
 }
@@ -240,7 +240,7 @@ void  MainWindow::onLoadSTLClick(){
  * 
  */
 void  MainWindow::onSaveSTLClick(){
-	mainController->onSaveSTLClick();
+	mainController->saveSTL();
 }
 
 

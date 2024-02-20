@@ -40,7 +40,7 @@ void  MainController::volRayCasting(QString dataDir) {
 
 	MainController::volume = new DICOMVolume(dataDir);
 
-	volume->vtk_rayCasting(MainController::mRenderWindow, MainController::mRenderer);
+	volume->rayCasting(MainController::mRenderWindow, MainController::mRenderer);
 	mRenderWindow->Render();
 
 
@@ -49,7 +49,7 @@ void  MainController::volRayCasting(QString dataDir) {
 void  MainController::axialView(QString dataDir) {
 
 
-	volume->vtk_reslicing(MainController::mRenderWindow2, MainController::mRenderer2, 1);
+	volume->reslicingDicom(MainController::mRenderWindow2, MainController::mRenderer2, 1);
 
 
 }
@@ -57,12 +57,12 @@ void  MainController::axialView(QString dataDir) {
 
 void  MainController::coronalView(QString dataDir) {
 
-	volume->vtk_reslicing(MainController::mRenderWindow3, MainController::mRenderer3, 2);
+	volume->reslicingDicom(MainController::mRenderWindow3, MainController::mRenderer3, 2);
 
 }
 void  MainController::sagitalView(QString dataDir) {
 
-	volume->vtk_reslicing(MainController::mRenderWindow4, MainController::mRenderer4, 3);
+	volume->reslicingDicom(MainController::mRenderWindow4, MainController::mRenderer4, 3);
 
 }
 
@@ -71,7 +71,7 @@ void  MainController::sagitalView(QString dataDir) {
 
 
 
-void  MainController::onLoadSTLClick(QString fileName) {
+void  MainController::loadSTL(QString fileName) {
 	if (!fileName.isEmpty()) {
 
 		inputFile = fileName.toStdString();
@@ -96,7 +96,7 @@ void  MainController::onLoadSTLClick(QString fileName) {
  * @brief save STL file in same directory
  *
  */
-void  MainController::onSaveSTLClick() {
+void  MainController::saveSTL() {
 	STLFileHandler handler(MainController::inputFile, "output.STL");
 	handler.SaveSTL(MainController::STLpolydata);
 
@@ -444,7 +444,7 @@ std::vector<int> MainController::extractMultiIntegers(std::string str) {
 	}
 	return result;
 }
-void MainController ::DrawSphere()
+void MainController ::drawSphere()
 {
 	SphereModel* model = new SphereModel();
 	SphereView* view = new SphereView(model);
@@ -465,7 +465,7 @@ void MainController ::DrawSphere()
  * @brief  draw cube on button click
  *
  */
-void MainController::onDrawCubeClick() {
+void MainController::drawCube() {
 
 	CubeModel* model = new CubeModel();
 	CubeView* view = new CubeView(model);
@@ -492,7 +492,7 @@ void MainController::onDrawCubeClick() {
  * @brief  draw cone on button click
  *
  */
-void MainController::onDrawConeClick() {
+void MainController::drawCone() {
 
 	ConeModel* model = new ConeModel();
 	ConeView* view = new ConeView(model);
@@ -521,7 +521,7 @@ void MainController::onDrawConeClick() {
  * @brief  draw cylinder on button click
  *
  */
-void MainController::onDrawCylinderClick() {
+void MainController::drawCylinder() {
 
 	CylinderModel* model = new CylinderModel();
 	CylinderView* view = new CylinderView(model);
@@ -550,7 +550,7 @@ void MainController::onDrawCylinderClick() {
  * @brief  draw donut on button click
  *
  */
-void MainController::onDrawDonutClick() {
+void MainController::drawDonut() {
 
 
 	DonutModel* model = new DonutModel();
@@ -581,7 +581,7 @@ void MainController::onDrawDonutClick() {
  * @brief  draw curved cylinder on button click
  *
  */
-void MainController::onDrawCurvedCylinderClick() {
+void MainController::drawCurvedCylinder() {
 
 	CurvedCylinderModel* model = new CurvedCylinderModel();
 	CurvedCylinderView* view = new CurvedCylinderView(model);
@@ -612,7 +612,7 @@ void MainController::onDrawCurvedCylinderClick() {
  * @brief  draw tube on button click
  *
  */
-void MainController::onDrawTubeClick() {
+void MainController::drawTube() {
 
 
 	TubeModel* model = new TubeModel();
@@ -644,7 +644,7 @@ void MainController::onDrawTubeClick() {
  * @brief  draw pyramid on button click
  *
  */
-void MainController::onDrawPyramidClick() {
+void MainController::drawPyramid() {
 
 	PyramidModel* model = new PyramidModel();
 	PyramidView* view = new PyramidView(model);
@@ -674,7 +674,7 @@ void MainController::onDrawPyramidClick() {
  * @brief  draw hemisphere on button click
  *
  */
-void MainController::onDrawHemisphereClick() {
+void MainController::drawHemisphere() {
 
 
 	HemisphereModel* model = new HemisphereModel();

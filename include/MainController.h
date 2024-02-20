@@ -15,7 +15,6 @@
 #include <vtkProperty.h>
 #include <vtkCellPicker.h>
 
-//////////////////////////////////////////////////////////
 #include <QMainWindow>
 
 #include <vtkActor.h>
@@ -107,7 +106,6 @@
 
 
 
-////////////////////////////////////////////////////////////////
 
 #include "Model.h"
 #include "View.h"
@@ -149,8 +147,6 @@ public:
     vtkSmartPointer<vtkPolyData> STLpolydata;
     vtkActor* pickedActor = vtkActor::New();
 
-    //vtkRenderWindow*  mRenderWindow;
-    //vtkRenderer* mRenderer;
     MyCommand* myCommand;
     vtkGenericOpenGLRenderWindow* GetRenWin();
     vtkRenderer* GetRen();
@@ -164,23 +160,23 @@ public:
     void mergeClick (std::string selecteditem1,std::string selecteditem2);
 
 
-    void onLoadSTLClick(QString fileName);
+    void loadSTL(QString fileName);
     void  volRayCasting(QString dataDir);
 
 
     void  axialView(QString dataDir);
     void  coronalView(QString dataDir);
     void  sagitalView(QString dataDir);
-    void onSaveSTLClick();
-    void DrawSphere();
-    void onDrawHemisphereClick();
-    void onDrawCubeClick();
-    void onDrawConeClick();
-    void onDrawPyramidClick();
-    void onDrawTubeClick();
-    void onDrawCylinderClick();
-    void onDrawCurvedCylinderClick();
-    void onDrawDonutClick();
+    void saveSTL();
+    void drawSphere();
+    void drawHemisphere();
+    void drawCube();
+    void drawCone();
+    void drawPyramid();
+    void drawTube();
+    void drawCylinder();
+    void drawCurvedCylinder();
+    void drawDonut();
 
     void setActorColorAndOpacity(vtkActor* actor, double r, double g, double b, double opacity);
     void rotateActor(vtkActor* actor, double angle, double angle2, double angle3);

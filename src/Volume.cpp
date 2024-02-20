@@ -8,8 +8,12 @@
 #include "Controller.h"
 //forward declaration 
 VTK_MODULE_INIT(vtkRenderingVolumeOpenGL2);
-//E:\git projects\DONE\MedicalVisualisation-GUI-using-VTK-main\MedicalVisualisation-GUI-using-VTK-main\data
-// Constructor that takes the dicom directory as an argument.
+/**
+ * @brief constructor 
+ *
+ * @param dicom directory
+ *
+ */
 DICOMVolume::DICOMVolume(QString dataDir)
 {
  
@@ -31,7 +35,6 @@ DICOMVolume::DICOMVolume(QString dataDir)
 
 }
 
-// Destructor that deletes the vtk objects.
 DICOMVolume::~DICOMVolume()
 {
     // Delete the vtk objects.
@@ -45,57 +48,15 @@ DICOMVolume::~DICOMVolume()
     volume->Delete();
 }
 
-/*
-void  DICOMVolume::vtk_surface_rendering_UI(vtkRenderWindow* renWin, vtkRenderer* aRenderer, QString dataDir)
-{
-  
-    reader->SetDirectoryName(dataDir.toStdString().c_str());
-    reader->Update();
-    // Create a vtkRenderWindowInteractor object
-    vtkSmartPointer<vtkRenderWindowInteractor> iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    renWin->AddRenderer(aRenderer);
+/**
+ * @brief render volume 
+ *
+ * @param vtkRenderWindow
+ * @param vtkRenderer
+ *
+ */
 
-    // Create a vtkContourFilter object
-    vtkSmartPointer<vtkContourFilter> surfaceExtractor = vtkSmartPointer<vtkContourFilter>::New();
-    // Set the input and value of the contour filter
-    surfaceExtractor->SetInputConnection(reader->GetOutputPort());
-    surfaceExtractor->SetValue(0, 0.0);
-    // Create a vtkPolyDataNormals object
-    vtkSmartPointer<vtkPolyDataNormals> surfaceNormals = vtkSmartPointer<vtkPolyDataNormals>::New();
-    // Set the input and feature angle of the polydata normals
-    surfaceNormals->SetInputConnection(surfaceExtractor->GetOutputPort());
-    surfaceNormals->SetFeatureAngle(60.0);
-    // Create a vtkPolyDataMapper object
-    vtkSmartPointer<vtkPolyDataMapper> surfaceMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    // Set the input and scalar visibility of the polydata mapper
-    surfaceMapper->SetInputConnection(surfaceNormals->GetOutputPort());
-    surfaceMapper->ScalarVisibilityOff();
-
-    vtkSmartPointer<vtkActor> surface = vtkSmartPointer<vtkActor>::New();
-    surface->SetMapper(surfaceMapper);
-
-    vtkSmartPointer<vtkCamera> aCamera = vtkSmartPointer<vtkCamera>::New();
-    // Set the camera parameters
-    aCamera->SetViewUp(0, 0, -1);
-    aCamera->SetPosition(0, 1, 0);
-    aCamera->SetFocalPoint(0, 0, 0);
-    aCamera->ComputeViewPlaneNormal();
-
-    aRenderer->AddActor(surface);
-    aRenderer->SetActiveCamera(aCamera);
-    aRenderer->ResetCamera();
-    aCamera->Dolly(1);
-    aRenderer->ResetCameraClippingRange();
-
-    iren->SetRenderWindow(renWin);
-    iren->SetInteractorStyle(vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New());
-    myCommand = MyCommand::New();
-  //  iren->AddObserver(vtkCommand::LeftButtonPressEvent, myCommand);
-    renWin->Render();
-}
-*/
-
-void DICOMVolume::vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer) {
+void DICOMVolume::rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer) {
    
     renWin->AddRenderer(aRenderer);
     vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::New();
@@ -166,7 +127,7 @@ void DICOMVolume::vtk_rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer
  */
 
 
-void DICOMVolume::vtk_reslicing(vtkRenderWindow* renWin, vtkRenderer* aRenderer,  int view) {
+void DICOMVolume::reslicingDicom(vtkRenderWindow* renWin, vtkRenderer* aRenderer,  int view) {
 
 
    // Calculate the center of the volume
