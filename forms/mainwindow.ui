@@ -249,6 +249,9 @@
          </spacer>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6"/>
+        </item>
+        <item>
          <widget class="QPushButton" name="nextButton">
           <property name="text">
            <string>next</string>

@@ -128,7 +128,13 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
+
+
 public:
+    QSlider* widthSlider;
+    QSlider* levelSlider;
+    QSlider* cutSlider;
+    QLabel* WLlabel;
     Ui::MainWindow* ui;
     //vtkNew<vtkGenericOpenGLRenderWindow> mRenderWindow;
     //vtkNew<vtkRenderer> mRenderer;
@@ -153,6 +159,9 @@ public:
     vtkNew<customMouseInteractorStyle> style;
     MyCommand* myCommand;
 public slots:
+    void onWSliderValueChanged(int value);
+    void onLSliderValueChanged(int value);
+    void onCutSliderValueChanged(int value);
     void onDrawConeClick();
     void onDrawSphereClick();
     void onDrawHemisphereClick();

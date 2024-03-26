@@ -35,11 +35,15 @@
 #include "vtkMatrix4x4.h"
 
 #include "vtkStreamingDemandDrivenPipeline.h"
-
+#include <vtkAutoInit.h>
+#include <vtkImageProperty.h>
+#include <vtkWindowLevelLookupTable.h>
 #include <QApplication.h>
 
 #include <QComboBox.h>
-
+#include <iostream>
+#include <sstream>
+#include <cmath>
 
 
 class MyCommand;
@@ -137,22 +141,45 @@ public:
 	~DICOMVolume();
 
 public:
-
+    void initialize();
 	void rayCasting(vtkRenderWindow* renWin, vtkRenderer* aRenderer);
     void reslicingDicom(vtkRenderWindow* renWin, vtkRenderer* aRenderer, int view);
+    void setWindowWidth(vtkRenderWindow* renWin, double WindowWidth);
+    void setWindowLevel(vtkRenderWindow* renWin, double WindowLevel);
 
+
+
+    vtkSmartPointer<vtkPolyData> MyCreateSimplePlane(const double* corners);
+    void volumeSlicer(int z);
+
+
+
+
+
+
+
+    QString dataDir;
 	MyCommand* myCommand;
-
 	vtkSmartPointer<vtkDICOMImageReader> reader;
-    vtkSmartPointer<vtkAlgorithmOutput> readerOutput;
-  //  auto readerOutput = reader->GetOutputPort();
+    vtkSmartPointer<vtkImageData> imageData;
 	vtkSmartPointer<vtkInteractorStyleTrackballCamera> style;
 	vtkSmartPointer<vtkRenderWindowInteractor> iren;
 	vtkSmartPointer<vtkGPUVolumeRayCastMapper> volumeMapper;
+    vtkGPUVolumeRayCastMapper* volumeMapperMain;
+    vtkVolumeProperty* volumeProperty1;
+    vtkCamera* vCamera;
+    vtkRenderWindow* vRenWin;
+    vtkRenderer* vRenderer;
+    vtkSmartPointer<vtkPlane > cutplane;
+    vtkVolume* volumCut;
 	vtkSmartPointer<vtkPiecewiseFunction> opacityTransferFunction;
 	vtkSmartPointer<vtkColorTransferFunction> colorTransferFunction;
 	vtkSmartPointer<vtkVolumeProperty> volumeProperty;
 	vtkSmartPointer<vtkVolume> volume;
+    vtkSmartPointer<vtkWindowLevelLookupTable> myLookupTable; 
+    double WindowLevel=0;
+    double WindowWidth=0;
+    double volLength = 0;
 };
 
 

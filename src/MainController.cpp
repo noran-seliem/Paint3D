@@ -3,31 +3,18 @@
 
 
 MainController::MainController(vtkRenderWindow* renWin, vtkRenderer* aRenderer) {
-	//mRenderer = aRenderer;
-	//mRenderWindow = renWin;
-
 
 	mRenderWindow->AddRenderer(mRenderer);
 	mRenderer->ResetCamera();
-//	mRenderWindow->Render();
 	vtkNew<vtkNamedColors> colors;
 	mRenderer->SetBackground(colors->GetColor3d("Cornsilk").GetData());
 	myCommand = MyCommand::New();
 	iren = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-	//iren->SetRenderWindow(mRenderWindow);
-	//iren->AddObserver(vtkCommand::LeftButtonPressEvent, myCommand);
 
-	/////////////////
-
-	//iren->Initialize();
-	////renWin->Render();
-	//iren->Start();
-	///////////////////test///////////////
 	mRenderWindow2->AddRenderer(mRenderer2);
 	mRenderWindow3->AddRenderer(mRenderer3);
 	mRenderWindow4->AddRenderer(mRenderer4);
 	mRenderer2->SetBackground(colors->GetColor3d("Cornsilk").GetData());
-	////////////////////////////////////
 
 }
 
@@ -39,15 +26,32 @@ void  MainController::volRayCasting(QString dataDir) {
 
 
 	MainController::volume = new DICOMVolume(dataDir);
-
+	volume->initialize();
 	volume->rayCasting(MainController::mRenderWindow, MainController::mRenderer);
 	mRenderWindow->Render();
 
+}
+void  MainController::changeWindowLevel( double WindowLevel) {
+
+	volume->setWindowLevel(MainController::mRenderWindow2, WindowLevel);
+	volume->setWindowLevel(MainController::mRenderWindow3, WindowLevel);
+	volume->setWindowLevel(MainController::mRenderWindow4, WindowLevel);
+
 
 }
+void  MainController::changeCutPlane( double z) {
 
+	volume->volumeSlicer(z);
+
+
+}
+void  MainController::changeWindowWidth( double WindowWidth) {
+
+	volume->setWindowWidth(MainController::mRenderWindow2, WindowWidth);
+	volume->setWindowWidth(MainController::mRenderWindow3, WindowWidth);
+	volume->setWindowWidth(MainController::mRenderWindow4, WindowWidth);
+}
 void  MainController::axialView(QString dataDir) {
-
 
 	volume->reslicingDicom(MainController::mRenderWindow2, MainController::mRenderer2, 1);
 

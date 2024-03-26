@@ -9,12 +9,14 @@
 #include <iostream>
 #include <qmessagebox>
 #include <qmouseevent>
-
+#include <QSlider> 
 
 #include <QVTKInteractor.h>
+#include <QWidget.h>
 #include <vector>
 #include <iostream>
 #include <sstream>
+
 
 
 
@@ -70,13 +72,49 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->openGLWidget_4->hide();
 	ui->openGLWidget_5->hide();
 
+	// Create a RangeSlider instance
+	//ctkRangeSlider* rangesldr = new ctkRangeSlider(Qt::Horizontal,0);
+	//ui->verticalLayout_4->addWidget(rangesldr);
+	//ctkRangeSlider* rangesldr2 = new ctkRangeSlider(Qt::Horizontal, 0);
+	//ui->verticalLayout_4->addWidget(rangesldr2);
+
+
+	widthSlider = new QSlider(Qt::Horizontal);
+	widthSlider->setRange(0, 2000); // Set the range
+	widthSlider->setTickInterval(100); // Set tick interval
+	levelSlider = new QSlider(Qt::Horizontal);
+	levelSlider->setRange(0, 600); // Set the range 
+	levelSlider->setTickInterval(20); // Set tick interval
+	cutSlider = new QSlider(Qt::Horizontal);
+	//cutSlider->setRange(0, 600); // Set the range
+	cutSlider->setTickInterval(10); // Set tick interval
+
+
+	 WLlabel = new QLabel("width and level", this);
+
+	 ui->verticalLayout_4->addWidget(WLlabel);
+	 ui->verticalLayout_4->addWidget(widthSlider);
+	 ui->verticalLayout_4->addWidget(levelSlider);
+	 ui->verticalLayout_4->addWidget(cutSlider);
+
+	 WLlabel->hide();
+	 widthSlider->hide();
+	 levelSlider->hide();
+	 
+
 
 	/**
 	 * @brief Set the UI connections
 	 * 
 	 */
 
-	
+	QObject::connect(widthSlider, &QSlider::valueChanged,
+		 this, &MainWindow::onWSliderValueChanged);
+	QObject::connect(levelSlider, &QSlider::valueChanged,
+		 this, &MainWindow::onLSliderValueChanged);
+	QObject::connect(cutSlider, &QSlider::valueChanged,
+		 this, &MainWindow::onCutSliderValueChanged);
+
 	QObject::connect(ui->STLButton, &QPushButton::clicked,
 		this, &MainWindow::onLoadSTLClick);
 		
@@ -124,6 +162,18 @@ MainWindow::~MainWindow()
 {
 	delete ui;
 }
+void MainWindow::onWSliderValueChanged(int value)
+{
+	mainController->changeWindowWidth(value);
+}
+void MainWindow::onLSliderValueChanged(int value)
+{
+	mainController->changeWindowLevel(value);
+}
+void MainWindow::onCutSliderValueChanged(int value)
+{
+	mainController->changeCutPlane(value);
+}
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 {
@@ -155,12 +205,17 @@ void  MainWindow::onLoadVolClick() {
 	ui->openGLWidget_3->show();
 	ui->openGLWidget_4->show();
 	ui->openGLWidget_5->show();
+	WLlabel->show();
+	widthSlider->show();
+	levelSlider->show();
 	mainController->volRayCasting(dataDir);
 
 	mainController->axialView(dataDir);
 	mainController->coronalView(dataDir);
 
 	mainController->sagitalView(dataDir);
+	cutSlider->setRange(10, mainController->volume->volLength); // Set the range
+
 }
 /**
  * @brief draw sphere on button click

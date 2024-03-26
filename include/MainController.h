@@ -138,6 +138,8 @@ public:
     std::vector<std:: string> objectNames;
 
 
+    double WindowWidth = 0;
+    double WindowLevel = 0;
     int objectCount = 0;
     int objectNumber = 0;
     int extractInteger(std::string str);
@@ -163,11 +165,11 @@ public:
     void loadSTL(QString fileName);
     void  volRayCasting(QString dataDir);
 
-
     void  axialView(QString dataDir);
     void  coronalView(QString dataDir);
     void  sagitalView(QString dataDir);
     void saveSTL();
+
     void drawSphere();
     void drawHemisphere();
     void drawCube();
@@ -184,6 +186,9 @@ public:
     void translateActor(vtkActor* actor, double x, double y, double z);
     void mergeActors(vtkActor* actor1, vtkActor* actor2);
     void deleteActor(vtkActor* actor);
+    void changeWindowLevel(double WindowLevel);
+    void changeCutPlane(double z);
+    void changeWindowWidth(double WindowWidth);
 };
 
 #endif
